@@ -1,2 +1,2 @@
-# kopsc-infra
-Infrastructure automation and orchestration for KernelOpsConsulting (KOPSC)
+# kopsc-infrastructure
+Infrastructure, automation and orchestration for KernelOpsConsulting (KOPSC)
