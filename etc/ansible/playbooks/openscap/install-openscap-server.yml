@@ -1,7 +1,7 @@
 # This installs OpenSCAP, SCAP content, and prepares the server to run local/remote scans
 ---
 - name: Install and configure OpenSCAP server
-  hosts: openscap-server
+  hosts: test-openscap-server
   become: true
 
   tasks:
