@@ -1,0 +1,49 @@
+# This will:
+# 1. Run a CIS scan
+# 2. Save report and results
+# 3. generate and apply fixes
+
+---
+- name: Run OpenSCAP CIS scan and apply remediation
+  hosts: development
+  become: true
+
+  vars:
+    profile_id: xccdf_org.ssgproject.content_profile_cis
+    scap_content: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
+    scan_output_dir: /tmp/openscap_results
+
+  tasks:
+    - name: Create output directory
+      file:
+        path: "{{ scan_output_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Run CIS compliance scan
+      shell: >
+        oscap xccdf eval
+        --profile {{ profile_id }}
+        --results {{ scan_output_dir }}/results.xml
+        --report {{ scan_output_dir }}/report.html
+        {{ scap_content }}
+      args:
+        warn: false
+
+    - name: Generate remediation script
+      shell: >
+        oscap xccdf generate fix
+        --profile {{ profile_id }}
+        {{ scap_content }} > {{ scan_output_dir }}/fix.sh
+      args:
+        warn: false
+
+    - name: Make remediation script executable
+      file:
+        path: "{{ scan_output_dir }}/fix.sh"
+        mode: '0755'
+        state: file
+
+    - name: Apply CIS fixes (optional)
+      command: "{{ scan_output_dir }}/fix.sh"
+      when: apply_fixes | default(true)
