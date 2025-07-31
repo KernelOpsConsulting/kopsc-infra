@@ -5,7 +5,7 @@
 
 ---
 - name: Install and configure OpenSCAP server with HTML reporting
-  hosts: openscap
+  hosts: development
   become: true
 
   vars:
