@@ -1,0 +1,23 @@
+# This installs OpenSCAP on each development host that will be scanned
+
+---
+- name: Install OpenSCAP tools on agent hosts
+  hosts: development:!test:!production
+  become: true
+
+  tasks:
+    - name: Install OpenSCAP tools (CentOS/RHEL)
+      package:
+        name:
+          - openscap-scanner
+          - scap-security-guide
+        state: present
+
+    - name: Ensure SCAP content is present
+      stat:
+        path: /usr/share/xml/scap/ssg/content
+      register: scap_dir
+
+    - name: Print SCAP data directory status
+      debug:
+        var: scap_dir.stat.exists
