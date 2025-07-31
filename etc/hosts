@@ -1,6 +1,6 @@
 # All KOPSC hosts for local DNS resolving
 ## sudo vi /etc/hosts and paste the contents of this file
-### to resolve DNS on Windows PC paste below as administrator in "C:\Windows\System32\drivers\etc\hosts" file
+### to resolve DNS on Windows PC paste below as administrator in "C:\Windows\System32\drivers\etc\hosts" file 
 
 #[development]
 10.5.5.50       dev-semaphore.kernelopsconsulting.com  dev-semaphore
