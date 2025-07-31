@@ -9,7 +9,7 @@
     - name: Install OpenSCAP tools (CentOS/RHEL)
       package:
         name:
-          - openscap-scanner
+          - test-openscap-scanner
           - scap-security-guide
         state: present
 
