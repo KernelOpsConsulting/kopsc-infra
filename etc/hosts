@@ -19,6 +19,9 @@
 #[zabbix]
 10.5.5.76       test-zabbix-ken.kernelopsconsulting.com  test-zabbix-ken
 
+#[openscap]
+10.5.5.82       test-openscap-server.kernelopsconsulting.com    test-openscap-server
+
 #[semaphore]
 10.5.5.50      dev-semaphore.kernelopsconsulting.com  dev-semaphore
 10.5.5.79      test-semaphore.kernelopsconsulting.com  test-semaphore
