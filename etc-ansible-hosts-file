@@ -1,7 +1,7 @@
 # All KOPSC hosts split by environment for ansible automation 
 ## sudo vi /etc/ansible/hosts and paste the contents of this file
 ### USE COMMAND BELOW TO SSH WITH HOSTNAME:
-#### for host in dev-semaphore dev-centos8-config dev-centos9-config dev-ubuntu20-config dev-testdummy-ubuntu20 test-ansible-ken test-zabbix-ken test-semaphore pfsense proxmox; do ssh-copy-id local_admin@$host; done
+#### for host in dev-semaphore dev-centos8-config dev-centos9-config dev-ubuntu20-config dev-testdummy-ubuntu20 test-ansible-ken test-zabbix-ken test-semaphore proxmox; do ssh-copy-id local_admin@$host; done
 
 [development]
 dev-semaphore                   #10.5.5.50
