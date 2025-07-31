@@ -1,1 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xccdf:Tailoring
+    xmlns:xccdf="http://checklists.nist.gov/xccdf/1.1"
+    id="cis-centos9-excludes"
+    xml:lang="en"
+    xmlns="http://checklists.nist.gov/xccdf/1.1">
+
+  <version>1.0</version>
+  <metadata>
+    <title>CIS CentOS 9 Exclusions - Disable Advanced and Firewall</title>
+    <description>Exclude advanced CIS rules and firewall settings from remediation.</description>
+  </metadata>
+
+  <profile id="xccdf_org.ssgproject.content_profile_cis">
+    <!-- Exclude all rules tagged as "level2" (advanced) -->
+    <select idref="xccdf_org.ssgproject.content_rule_level2" selected="false"/>
+    
+    <!-- Exclude all firewall related rules -->
+    <select idref="xccdf_org.ssgproject.content_rule_firewalld_disabled" selected="false"/>
+    <select idref="xccdf_org.ssgproject.content_rule_firewalld_state_enabled" selected="false"/>
+    <select idref="xccdf_org.ssgproject.content_rule_firewall_rules" selected="false"/>
+  </profile>
+
+</xccdf:Tailoring>
 
