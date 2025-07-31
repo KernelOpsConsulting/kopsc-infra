@@ -2,8 +2,14 @@
 # 1. Run a CIS scan
 # 2. Save report and results
 # 3. generate and apply fixes
-# Make sure to update the "tailoring_file:" with the correct exclude file before running script
-
+#
+#for ubuntu22 scans & exclusions:
+# update the "tailoring_file: excludes/cis-ubuntu22-excludes.xml" &
+# update "scap_content: /usr/share/xml/scap/ssg/content/ssg-ubuntu2204-ds.xml"
+#
+#for centos9 scans & exclusions:
+# update the "tailoring_file: excludes/cis-centos9-excludes.xml" &
+# update "scap_content: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml"
 ---
 - name: Run OpenSCAP CIS scan and apply remediation
   hosts: development
