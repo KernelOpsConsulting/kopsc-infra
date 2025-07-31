@@ -1,0 +1,88 @@
+# All KOPSC hosts split by environment for ansible automation 
+## sudo vi /etc/ansible/hosts and paste the contents of this file
+
+[development]
+dev-semaphore                   #10.5.5.50
+dev-centos8-config              #10.5.5.54
+dev-centos9-config              #10.5.5.55
+dev-ubuntu20-config              #10.5.5.56
+dev-testdummy-ubuntu20          #10.5.5.57
+
+[test]
+test-ansible-ken                #10.5.5.75
+test-zabbix-ken                 #10.5.5.76
+
+[production]
+prod-ansible-mike01             #10.5.5.78
+
+[zabbix]
+test-zabbix-ken                 #10.5.5.76
+
+[semaphore]
+dev-semaphore                   #10.5.5.50
+test-semaphore                  #10.5.5.79
+
+[pfsense]
+pfsense                         #10.5.5.1
+
+[proxmox]
+proxmox                         #10.5.5.3
+
+
+
+
+[idrac]
+10.5.5.46       #Proxmox backend
+
+[tpwap]
+10.5.5.2        #Tplink wirelwss access point
+
+[tpswitch]
+10.5.5.17       #Tplink TL-SG108E smart managed switch
+
+
+
+
+
+
+
+
+
+#BELOW THIS LINE SERVERS ARE RECOGNIZED BY ONLY IP
+[development]
+10.5.5.50       #dev-semaphore
+10.5.5.54       #dev-centos8-config
+10.5.5.55       #dev-centos9-config
+10.5.5.56       #dev-ubuntu20-config
+10.5.5.57       #dev-testdummy-ubuntu20
+
+[test]
+10.5.5.75       #test-ansible-ken
+10.5.5.76       #test-zabbix-ken
+
+[production]
+#10.5.5.78       #prod-ansible-mike01
+
+
+
+[zabbix]
+10.5.5.76       #test-zabbix-ken
+
+[semaphore]
+#10.5.5.50      #dev-semaphore
+10.5.5.79       #test-semaphore
+
+[pfsense]
+10.5.5.1        #Router ; Firewall ; WireguardVPN
+
+[proxmox]
+10.5.5.3        #Hosted on port 8006
+
+[idrac]
+10.5.5.46       #Proxmox backend
+
+[tpwap]
+10.5.5.2        #Tplink wirelwss access point
+
+[tpswitch]
+10.5.5.17       #Tplink TL-SG108E smart managed switch
