@@ -11,7 +11,7 @@
   vars:
     scan_output_dir: /tmp/openscap_results
     web_report_dir: /var/www/html/openscap
-    scap_content: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
+    scap_content: /usr/share/xml/scap/ssg/content/ssg-cs9-ds.xml
     profile_id: xccdf_org.ssgproject.content_profile_cis
 
   tasks:
@@ -31,12 +31,6 @@
     - name: Generate timestamped filename
       set_fact:
         timestamped_report: "report_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.html"
-
-    - name: Download CentOS 9 SSG content file
-      get_url:
-        url: https://github.com/ComplianceAsCode/content/releases/download/v0.1.77/ssg-centos9-ds.xml
-        dest: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
-        mode: '0644'
 
     - name: Run dummy OpenSCAP scan to generate HTML report
       shell: >
