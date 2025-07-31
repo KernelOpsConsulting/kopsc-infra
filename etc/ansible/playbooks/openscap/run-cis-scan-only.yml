@@ -11,6 +11,7 @@
   vars:
     profile_id: xccdf_org.ssgproject.content_profile_cis
     scap_content: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
+    tailoring_file: excludes/cis-centos9-excludes.xml
     scan_output_dir: /tmp/openscap_results
 
   tasks:
@@ -24,6 +25,7 @@
       shell: >
         oscap xccdf eval
         --profile {{ profile_id }}
+        --tailoring {{ tailoring_file }}
         --results {{ scan_output_dir }}/results.xml
         --report {{ scan_output_dir }}/report.html
         {{ scap_content }}
