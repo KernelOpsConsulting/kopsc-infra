@@ -1,8 +1,16 @@
 #This will:
 # 1. Run a CIS scan
 # 2. Save report and results
-
+#
 # Optionally: To only scan without fixing, leave 'apply_fixes' undefined or set to false
+#
+#for ubuntu22 scans & exclusions:
+# update the "tailoring_file: excludes/cis-ubuntu22-excludes.xml" &
+# update "scap_content: /usr/share/xml/scap/ssg/content/ssg-ubuntu2204-ds.xml"
+#
+#for centos9 scans & exclusions:
+# update the "tailoring_file: excludes/cis-centos9-excludes.xml" &
+# update "scap_content: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml"
 ---
 - name: Run OpenSCAP CIS scan
   hosts: development
