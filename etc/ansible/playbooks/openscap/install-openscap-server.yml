@@ -32,6 +32,12 @@
       set_fact:
         timestamped_report: "report_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.html"
 
+    - name: Download CentOS 9 SSG content file
+  get_url:
+    url: https://github.com/ComplianceAsCode/content/releases/download/v0.1.77/ssg-centos9-ds.xml
+    dest: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
+    mode: '0644'
+
     - name: Run dummy OpenSCAP scan to generate HTML report
       shell: >
         oscap xccdf eval
