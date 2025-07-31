@@ -1,0 +1,28 @@
+# This installs OpenSCAP, SCAP content, and prepares the server to run local/remote scans
+---
+- name: Install and configure OpenSCAP server
+  hosts: openscap-server
+  become: true
+
+  tasks:
+    - name: Install OpenSCAP and security guide (CentOS/RHEL)
+      package:
+        name:
+          - openscap-scanner
+          - scap-security-guide
+        state: present
+
+    - name: Ensure SCAP content directory exists
+      file:
+        path: /usr/share/xml/scap/ssg/content
+        state: directory
+        mode: '0755'
+
+    - name: Display available security profiles
+      shell: oscap info /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
+      register: profile_info
+      changed_when: false
+
+    - name: Print security profile info
+      debug:
+        var: profile_info.stdout
