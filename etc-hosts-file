@@ -12,7 +12,7 @@
 #[test]
 10.5.5.75       test-ansible-ken.kernelopsconsulting.com  test-ansible-ken
 10.5.5.76       test-zabbix-ken.kernelopsconsulting.com  test-zabbix-ken
-10.5.5.81       test-ansible-mike01.kernelopsconsulting.com  test-ansible.mike
+10.5.5.81       test-ansible-mike01.kernelopsconsulting.com  test-ansible-mike01
 
 #[production]
 
