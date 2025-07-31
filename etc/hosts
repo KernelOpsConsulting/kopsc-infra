@@ -8,6 +8,7 @@
 10.5.5.55       dev-centos9-config.kernelopsconsulting.com  dev-centos9-config
 10.5.5.56       dev-ubuntu20-config.kernelopsconsulting.com  dev-ubuntu20-config
 10.5.5.57       dev-testdummy-ubuntu20.kernelopsconsulting.com  dev-testdummy-ubuntu20
+10.5.5.83       dev-ubuntu22
 
 #[test]
 10.5.5.75       test-ansible-ken.kernelopsconsulting.com  test-ansible-ken
