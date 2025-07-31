@@ -1,28 +1,88 @@
-# This installs OpenSCAP, SCAP content, and prepares the server to run local/remote scans
+# This installs OpenSCAP, SCAP content, and prepares the server to run local/remote scans. In addition,
+# the script deploys Apache webserver to host the latest scans here: "http://test-openscap-server/openscap/latest.html" 
+#
+# Optional timestamped history: http://test-openscap-server/openscap/report_2025-07-31_14:02:11.html
+
 ---
-- name: Install and configure OpenSCAP server
-  hosts: test-openscap-server
+- name: Install and configure OpenSCAP server with HTML reporting
+  hosts: development
   become: true
 
+  vars:
+    scan_output_dir: /tmp/openscap_results
+    web_report_dir: /var/www/html/openscap
+    scap_content: /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
+    profile_id: xccdf_org.ssgproject.content_profile_cis
+
   tasks:
-    - name: Install OpenSCAP and security guide (CentOS/RHEL)
-      package:
+    - name: Install required packages for OpenSCAP scanning
+      dnf:
         name:
           - openscap-scanner
           - scap-security-guide
         state: present
 
-    - name: Ensure SCAP content directory exists
+    - name: Create scan results directory
       file:
-        path: /usr/share/xml/scap/ssg/content
+        path: "{{ scan_output_dir }}"
         state: directory
         mode: '0755'
 
-    - name: Display available security profiles
-      shell: oscap info /usr/share/xml/scap/ssg/content/ssg-centos9-ds.xml
-      register: profile_info
-      changed_when: false
+    - name: Generate timestamped filename
+      set_fact:
+        timestamped_report: "report_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.html"
 
-    - name: Print security profile info
+    - name: Run dummy OpenSCAP scan to generate HTML report
+      shell: >
+        oscap xccdf eval
+        --profile {{ profile_id }}
+        --results {{ scan_output_dir }}/results.xml
+        --report {{ scan_output_dir }}/{{ timestamped_report }}
+        {{ scap_content }}
+      args:
+        warn: false
+
+    - name: Install Apache to serve HTML reports
+      dnf:
+        name: httpd
+        state: present
+
+    - name: Ensure Apache is started and enabled
+      systemd:
+        name: httpd
+        enabled: yes
+        state: started
+
+    - name: Create OpenSCAP web report directory
+      file:
+        path: "{{ web_report_dir }}"
+        state: directory
+        mode: '0755'
+
+    - name: Copy latest report to web-accessible directory
+      copy:
+        src: "{{ scan_output_dir }}/{{ timestamped_report }}"
+        dest: "{{ web_report_dir }}/{{ timestamped_report }}"
+        remote_src: true
+        mode: '0644'
+
+    - name: Create symlink to latest OpenSCAP report
+      file:
+        src: "{{ web_report_dir }}/{{ timestamped_report }}"
+        dest: "{{ web_report_dir }}/latest.html"
+        state: link
+        force: true
+
+    - name: Firewalld - allow HTTP access (optional, if firewalld is running)
+      firewalld:
+        service: http
+        permanent: true
+        state: enabled
+        immediate: true
+      when: ansible_facts.services['firewalld'].state == "running"
+
+    - name: Debug message for user access
       debug:
-        var: profile_info.stdout
+        msg: |
+          Latest OpenSCAP report:
+          http://{{ inventory_hostname }}/openscap/latest.html
