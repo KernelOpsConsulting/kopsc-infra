@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xccdf:Tailoring
+    xmlns:xccdf="http://checklists.nist.gov/xccdf/1.1"
+    id="cis-ubuntu22-excludes"
+    xml:lang="en"
+    xmlns="http://checklists.nist.gov/xccdf/1.1">
+
+  <version>1.0</version>
+  <metadata>
+    <title>CIS Ubuntu 22 Exclusions - Disable Advanced and Firewall</title>
+    <description>Exclude advanced CIS rules and firewall settings from remediation.</description>
+  </metadata>
+
+  <profile id="xccdf_org.ssgproject.content_profile_cis">
+    <!-- Exclude advanced rules -->
+    <select idref="xccdf_org.ssgproject.content_rule_level2" selected="false"/>
+    
+    <!-- Exclude firewall rules -->
+    <select idref="xccdf_org.ssgproject.content_rule_ufw_enabled" selected="false"/>
+    <select idref="xccdf_org.ssgproject.content_rule_ufw_logging" selected="false"/>
+  </profile>
+
+</xccdf:Tailoring>
