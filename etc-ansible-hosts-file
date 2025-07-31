@@ -16,7 +16,7 @@ test-zabbix-ken                 #10.5.5.76
 test-semaphore                  #10.5.5.79
 
 [production]
-prod-ansible-mike01             #10.5.5.78
+#prod-ansible-mike01             #10.5.5.78  #SERVER HAS BEEN DECOMMISSIONED
 
 [zabbix]
 test-zabbix-ken                 #10.5.5.76
