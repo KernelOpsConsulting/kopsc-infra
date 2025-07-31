@@ -14,12 +14,16 @@ dev-testdummy-ubuntu20          #10.5.5.57
 test-ansible-ken                #10.5.5.75
 test-zabbix-ken                 #10.5.5.76
 test-semaphore                  #10.5.5.79
+test-openscap-server            #10.5.5.82
 
 [production]
 prod-ansible-mike01             #10.5.5.78
 
 [zabbix]
 test-zabbix-ken                 #10.5.5.76
+
+[openscap]
+test-openscap-server            #10.5.5.82
 
 [semaphore]
 dev-semaphore                   #10.5.5.50
