@@ -32,36 +32,30 @@
       set_fact:
         timestamped_report: "report_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.html"
 
-    - name: Run OpenSCAP scan (async)
-      command: >
-        oscap xccdf eval
-        --profile {{ profile_id }}
-        --results {{ scan_output_dir }}/results.xml
-        --report {{ scan_output_dir }}/{{ timestamped_report }}
-        {{ scap_content }}
-      async: 1800
-      poll: 0
-      register: openscap_job
+    - name: Run dummy OpenSCAP scan to generate HTML report
+      command:
+        argv:
+          - oscap
+          - xccdf
+          - eval
+          - --profile
+          - "{{ profile_id }}"
+          - --results
+          - "{{ scan_output_dir }}/results.xml"
+          - --report
+          - "{{ scan_output_dir }}/{{ timestamped_report }}"
+          - "{{ scap_content }}"
       ignore_errors: yes
 
-    - name: Wait for OpenSCAP scan to complete
-      async_status:
-        jid: "{{ openscap_job.ansible_job_id }}"
-      register: openscap_result
-      until: openscap_result.finished
-      retries: 60
-      delay: 10
-      ignore_errors: yes
-
-    - name: Verify that HTML report was generated
+    - name: Verify OpenSCAP scan generated report
       stat:
         path: "{{ scan_output_dir }}/{{ timestamped_report }}"
-      register: report_check
+      register: report_stat
 
-    - name: Fail if OpenSCAP HTML report is missing
+    - name: Fail if report was not generated
       fail:
-        msg: "OpenSCAP HTML report was not created."
-      when: not report_check.stat.exists
+        msg: "OpenSCAP scan failed to produce the HTML report!"
+      when: not report_stat.stat.exists
 
     - name: Install Apache to serve HTML reports
       dnf:
