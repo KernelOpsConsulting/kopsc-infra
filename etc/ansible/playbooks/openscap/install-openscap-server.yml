@@ -48,14 +48,6 @@
         dest: "{{ web_report_dir }}/latest.html"
         mode: '0644'
 
-    - name: Firewalld - allow HTTP access (optional, if firewalld is running)
-      firewalld:
-        service: http
-        permanent: true
-        state: enabled
-        immediate: true
-      when: ansible_facts.services['firewalld'].state == "running"
-
     - name: Debug message for user access
       debug:
         msg: |
