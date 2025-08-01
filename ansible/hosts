@@ -10,6 +10,7 @@ dev-centos9-config              #10.5.5.55
 dev-ubuntu20-config              #10.5.5.56
 dev-testdummy-ubuntu20          #10.5.5.57
 dev-jumpbox-02                  #10.5.5.84
+dev-openvas-server              #10.5.5.83
 
 [test]
 test-ansible-ken                #10.5.5.75
