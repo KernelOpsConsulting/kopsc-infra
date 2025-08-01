@@ -33,14 +33,18 @@
         timestamped_report: "report_{{ ansible_date_time.date }}_{{ ansible_date_time.time }}.html"
 
     - name: Run dummy OpenSCAP scan to generate HTML report
-      shell: >
-        oscap xccdf eval
-        --profile xccdf_org.ssgproject.content_profile_cis
-        --results {{ scan_output_dir }}/results.xml
-        --report {{ scan_output_dir }}/{{ timestamped_report }}
-        /usr/share/xml/scap/ssg/content/ssg-cs9-ds.xml
-      args:
-        warn: false
+      command:
+        cmd:
+          - oscap
+          - xccdf
+          - eval
+          - --profile
+          - xccdf_org.ssgproject.content_profile_cis
+          - --results
+          - "{{ scan_output_dir }}/results.xml"
+          - --report
+          - "{{ scan_output_dir }}/{{ timestamped_report }}"
+          - "{{ scap_content }}"
 
     - name: Install Apache to serve HTML reports
       dnf:
