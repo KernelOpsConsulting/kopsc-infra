@@ -35,10 +35,10 @@
     - name: Run dummy OpenSCAP scan to generate HTML report
       shell: >
         oscap xccdf eval
-        --profile {{ profile_id }}
+        --profile xccdf_org.ssgproject.content_profile_cis
         --results {{ scan_output_dir }}/results.xml
         --report {{ scan_output_dir }}/{{ timestamped_report }}
-        {{ scap_content }}
+        /usr/share/xml/scap/ssg/content/ssg-cs9-ds.xml
       args:
         warn: false
 
