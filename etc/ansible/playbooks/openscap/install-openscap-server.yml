@@ -45,6 +45,17 @@
           - --report
           - "{{ scan_output_dir }}/{{ timestamped_report }}"
           - "{{ scap_content }}"
+      ignore_errors: yes
+
+    - name: Verify OpenSCAP scan generated report
+      stat:
+        path: "{{ scan_output_dir }}/{{ timestamped_report }}"
+      register: report_stat
+
+    - name: Fail if report was not generated
+      fail:
+        msg: "OpenSCAP scan failed to produce the HTML report!"
+      when: not report_stat.stat.exists
 
     - name: Install Apache to serve HTML reports
       dnf:
