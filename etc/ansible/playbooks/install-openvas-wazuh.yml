@@ -13,10 +13,8 @@
   become: true
   vars:
     # Password for the gvmd admin user.  Change this to a secure value.
-    gvm_admin_password: "changeme"
-    # Version of Wazuh to install (default: latest 4.x).  Leaving this
-    # undefined causes the install script to pull the most recent release.
-    wazuh_install_version: ""
+    gvm_admin_password: "0526" # Version of Wazuh to install (default: latest 4.x).  Leaving this
+    wazuh_install_version: ""  # undefined causes the install script to pull the most recent release.
 
   tasks:
     - name: Ensure apt cache is up to date
