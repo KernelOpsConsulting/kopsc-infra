@@ -1,7 +1,6 @@
 ---
 - name: Install Wazuh Stack and Configure OpenVAS Integration
   hosts: test-wazuh-server
-  become: true
 
   vars:
     wazuh_version: "4.7.3"
