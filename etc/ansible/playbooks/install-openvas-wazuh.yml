@@ -1,105 +1,64 @@
 ---
-# OpenVAS and Wazuh deployment playbook
-#
-# This playbook installs and configures the Greenbone Vulnerability Manager
-# (commonly referred to as OpenVAS) on a Debian‑based system such as Kali Linux.
-# It also installs the Wazuh manager all‑in‑one stack on the same host to
-# provide SIEM functionality and ingest vulnerability scan results.  You can
-# customise inventory variables and groupings externally; by default this
-# playbook targets all hosts in your inventory.
-
-- name: Deploy OpenVAS (Greenbone Community Edition) and Wazuh manager
+- name: Deploy OpenVAS Scanner and Schedule Daily Scans
   hosts: test-openvas-server
   become: true
+
   vars:
-    # Password for the gvmd admin user.  Change this to a secure value.
-    gvm_admin_password: "admin"
-    wazuh_install_version: ""
-    # Version of Wazuh to install (default: latest 4.x).  Leaving this
-    # undefined causes the install script to pull the most recent release.
+    report_dir: /home/test-openvas-server/reports
+    report_retention_days: 7
+    scan_target: "10.5.5.0/24"
+    scan_target_id: "REPLACE_WITH_TARGET_UUID"
+    full_scan_id: "REPLACE_WITH_FULL_SCAN_UUID"
+    xml_format_id: "REPLACE_WITH_XML_FORMAT_UUID"
+    html_format_id: "REPLACE_WITH_HTML_FORMAT_UUID"
 
   tasks:
-    - name: Ensure apt cache is up to date
-      ansible.builtin.apt:
-        update_cache: yes
-        cache_valid_time: 3600
-
-    - name: Install packages for Greenbone Vulnerability Manager
-      ansible.builtin.apt:
+    - name: Install OpenVAS and dependencies
+      apt:
         name:
+          - openvas
           - gvm
+          - python3-lxml
+          - jq
+          - rsync
         state: present
-      notify:
-        - run gvm setup
+        update_cache: yes
 
-    # The gvm‑setup command performs the initial database setup, downloads the
-    # vulnerability feed and creates the necessary directories and services.
-    # It is idempotent because it checks for existing DB files before
-    # performing work.  Running it via a handler ensures it only executes when
-    # the gvm package is first installed or upgraded.
-    - name: Ensure gvmd service is enabled and running
-      ansible.builtin.service:
-        name: gvmd
-        state: started
-        enabled: yes
-
-    - name: Ensure ospd‑openvas service is enabled and running
-      ansible.builtin.service:
-        name: ospd-openvas
-        state: started
-        enabled: yes
-
-    - name: Create an admin user for GVM
-      ansible.builtin.command: "gvmd --create-user admin --password {{ gvm_admin_password }}"
+    - name: Run GVM setup
+      command: gvm-setup
       args:
-        creates: "/var/lib/gvm/users/admin"
-      register: gvm_user_result
-      changed_when: gvm_user_result.rc == 0
-      failed_when: gvm_user_result.rc not in [0,1]
+        creates: /var/lib/gvm/.notus/ntp/
+      register: gvm_setup
+      changed_when: gvm_setup.rc == 0
 
-    - name: Display the GVM admin user credentials
-      ansible.builtin.debug:
-        msg: |
-          GVM admin user created.  Use the following credentials to log in via
-          the Greenbone Security Assistant web interface:
-            Username: admin
-            Password: {{ gvm_admin_password }}
-          You can change this password later using `gvmd --user=admin --new-password=<newpass>`.
-
-    - name: Download Wazuh installation script
-      ansible.builtin.get_url:
-        url: "https://packages.wazuh.com/4.x/wazuh-install.sh"
-        dest: "/tmp/wazuh-install.sh"
+    - name: Create reports directory
+      file:
+        path: "{{ report_dir }}"
+        state: directory
+        owner: gvm
+        group: gvm
         mode: '0755'
 
-    - name: Run Wazuh installation script (all‑in‑one)
-      ansible.builtin.shell: |
-        set -eo pipefail
-        /tmp/wazuh-install.sh -a {{ '--wazuh-version ' + wazuh_install_version if wazuh_install_version | length > 0 else '' }}
-      args:
-        creates: "/var/ossec"
-      register: wazuh_install
-      environment:
-        WAZUH_PASSWORD: "{{ gvm_admin_password }}"
-      # The script outputs a large amount of data; reduce verbosity to avoid
-      # overwhelming the Ansible output.  Only report failure.
-      changed_when: wazuh_install.rc == 0
-      failed_when: wazuh_install.rc != 0
+    - name: Deploy scan script
+      copy:
+        dest: /usr/local/bin/run_openvas_scan.sh
+        content: |
+          #!/bin/bash
+          UUID=$(gvm-cli --gmp-username admin --gmp-password admin_password --xml "<create_task><name>Scheduled Scan</name><config id='{{ full_scan_id }}'/><target id='{{ scan_target_id }}'/></create_task>" | xmllint --xpath 'string(//create_task_response/@id)' -)
+          gvm-cli --gmp-username admin --gmp-password admin_password --xml "<start_task task_id='${UUID}'/>"
+          sleep 180
+          REPORT_ID=$(gvm-cli --gmp-username admin --gmp-password admin_password --xml "<get_reports filter='rows=1 sort-reverse=1'/>" | xmllint --xpath 'string(//report/@id)' -)
+          gvm-cli --gmp-username admin --gmp-password admin_password --xml "<get_report report_id='${REPORT_ID}' format_id='{{ xml_format_id }}'/>" > {{ report_dir }}/report-$(date +%F-%H%M).xml
+          gvm-cli --gmp-username admin --gmp-password admin_password --xml "<get_report report_id='${REPORT_ID}' format_id='{{ html_format_id }}'/>" > {{ report_dir }}/report-$(date +%F-%H%M).html
+          find {{ report_dir }} -type f -mtime +{{ report_retention_days }} -delete
+        mode: '0755'
+        owner: root
+        group: root
 
-    - name: Display Wazuh access information
-      ansible.builtin.debug:
-        msg: |
-          Wazuh installation completed.  The Wazuh dashboard should be
-          reachable on port 5601 of the server (Kibana).  Use the default
-          credentials created by the installation script (username: admin,
-          password: admin) unless you customised them during setup.  It may
-          take several minutes for the Wazuh services to fully initialise.
-
-  handlers:
-    - name: run gvm setup
-      ansible.builtin.command: gvm-setup
-      args:
-        creates: "/var/lib/gvm/data-objects/gvmd/gvmd_data.db"
-      # gvm‑setup may take a while; allow up to an hour to complete.
-      async: 3600
-      poll: 0
+    - name: Install cronjob for scan execution
+      cron:
+        name: "Daily OpenVAS Scan"
+        user: gvm
+        job: "/usr/local/bin/run_openvas_scan.sh"
+        minute: "0"
+        hour: "9"
