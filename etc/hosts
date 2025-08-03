@@ -12,7 +12,7 @@
 10.5.5.84       dev-jumpbox02.kernelopsconsulting.com  dev-jumpbox02
 10.5.5.89       test-openvas-server.kernelopsconsulting.com  test-openvas-server
 10.5.5.90       test-wazuh-server.kernelopsconsulting.com  test-wazuh-server
-10.5.5.94       test-zabbix-server.kernelopsconsulting.com  test-zabbix-server
+10.5.5.94       dev-zabbix-server.kernelopsconsulting.com  dev-zabbix-server
 
 #[test]
 10.5.5.75       test-ansible-ken.kernelopsconsulting.com  test-ansible-ken
