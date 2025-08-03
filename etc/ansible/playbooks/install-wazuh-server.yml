@@ -13,6 +13,16 @@
     dashboard_only_alerting: true
     alert_severity_threshold: 7.0
 
+  pre_tasks:
+    - name: Ensure python3-pip is installed
+      apt:
+        name: python3-pip
+        state: present
+
+    - name: Install required Python module 'six'
+      pip:
+        name: six
+
   tasks:
     - name: Install Wazuh Manager and Dependencies
       shell: |
@@ -54,3 +64,4 @@
       systemd:
         name: filebeat
         state: restarted
+
