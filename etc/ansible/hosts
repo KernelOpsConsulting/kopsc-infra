@@ -7,9 +7,10 @@
 dev-semaphore                   #10.5.5.50
 dev-centos8-config              #10.5.5.54
 dev-centos9-config              #10.5.5.55
-dev-ubuntu20-config              #10.5.5.56
+dev-ubuntu20-config             #10.5.5.56
 dev-testdummy-ubuntu20          #10.5.5.57
 dev-ubuntu22                    #10.5.5.83
+dev-jumpbox02                   #10.5.5.84
 
 [test]
 test-ansible-ken                #10.5.5.75
@@ -21,10 +22,17 @@ test-openscap-server            #10.5.5.82
 prod-ansible-mike01             #10.5.5.78
 
 [zabbix]
-test-zabbix-ken                 #10.5.5.76
+test-zabbix-ken15               #10.5.5.95
+dev-zabbix-server               #10.5.5.94
 
 [openscap]
 test-openscap-server            #10.5.5.82
+
+[openvas]
+test-openvas-server             #10.5.5.89
+
+[wazuh]
+test-wazuh-server               #10.5.5.90
 
 [semaphore]
 dev-semaphore                   #10.5.5.50
