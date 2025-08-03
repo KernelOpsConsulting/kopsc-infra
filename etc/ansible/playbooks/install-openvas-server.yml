@@ -1,64 +1,65 @@
 ---
-- name: Deploy OpenVAS Scanner and Schedule Daily Scans
-  hosts: test-openvas-server
+- name: Install Wazuh Stack and Configure OpenVAS Integration
+  hosts: test-wazuh-server
   become: true
 
   vars:
-    report_dir: /home/test-openvas-server/reports
-    report_retention_days: 7
-    scan_target: "10.5.5.0/24"
-    scan_target_id: "REPLACE_WITH_TARGET_UUID"
-    full_scan_id: "REPLACE_WITH_FULL_SCAN_UUID"
-    xml_format_id: "REPLACE_WITH_XML_FORMAT_UUID"
-    html_format_id: "REPLACE_WITH_HTML_FORMAT_UUID"
+    wazuh_version: "4.7.3"
+    elastic_version: "8.12.2"
+    openvas_host: test-openvas-server
+    openvas_report_dir: /home/test-openvas-server/reports
+    openvas_pull_user: root
+    openvas_pull_method: ssh
+    dashboard_only_alerting: true
+    alert_severity_threshold: 7.0
 
-  tasks:
-    - name: Install OpenVAS and dependencies
+  pre_tasks:
+    - name: Ensure required APT packages are present
       apt:
         name:
-          - openvas
-          - gvm
-          - python3-lxml
-          - jq
-          - rsync
+          - python3-pip
+          - python3-six
         state: present
-        update_cache: yes
+        update_cache: true
 
-    - name: Run GVM setup
-      command: gvm-setup
+  tasks:
+    - name: Install Wazuh Manager and Dependencies
+      shell: |
+        curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh
+        bash wazuh-install.sh --wazuh-version {{ wazuh_version }}
       args:
-        creates: /var/lib/gvm/.notus/ntp/
-      register: gvm_setup
-      changed_when: gvm_setup.rc == 0
+        creates: /var/ossec/bin/wazuh-control
 
-    - name: Create reports directory
-      file:
-        path: "{{ report_dir }}"
-        state: directory
-        owner: gvm
-        group: gvm
-        mode: '0755'
-
-    - name: Deploy scan script
+    - name: Configure Filebeat for OpenVAS Report Parsing
       copy:
-        dest: /usr/local/bin/run_openvas_scan.sh
+        dest: /etc/filebeat/filebeat.yml
         content: |
-          #!/bin/bash
-          UUID=$(gvm-cli --gmp-username admin --gmp-password admin_password --xml "<create_task><name>Scheduled Scan</name><config id='{{ full_scan_id }}'/><target id='{{ scan_target_id }}'/></create_task>" | xmllint --xpath 'string(//create_task_response/@id)' -)
-          gvm-cli --gmp-username admin --gmp-password admin_password --xml "<start_task task_id='${UUID}'/>"
-          sleep 180
-          REPORT_ID=$(gvm-cli --gmp-username admin --gmp-password admin_password --xml "<get_reports filter='rows=1 sort-reverse=1'/>" | xmllint --xpath 'string(//report/@id)' -)
-          gvm-cli --gmp-username admin --gmp-password admin_password --xml "<get_report report_id='${REPORT_ID}' format_id='{{ xml_format_id }}'/>" > {{ report_dir }}/report-$(date +%F-%H%M).xml
-          gvm-cli --gmp-username admin --gmp-password admin_password --xml "<get_report report_id='${REPORT_ID}' format_id='{{ html_format_id }}'/>" > {{ report_dir }}/report-$(date +%F-%H%M).html
-          find {{ report_dir }} -type f -mtime +{{ report_retention_days }} -delete
-        mode: '0755'
-        owner: root
-        group: root
+          filebeat.inputs:
+            - type: log
+              enabled: true
+              paths:
+                - "{{ openvas_report_dir }}/*.xml"
+              fields:
+                service: openvas
+          output.elasticsearch:
+            hosts: ["http://localhost:9200"]
+          setup.kibana:
+            host: "localhost:5601"
+      notify: Restart Filebeat
 
-    - name: Install cronjob for scan execution
-      cron:
-        name: "Daily OpenVAS Scan"
-        user: gvm
-        job: "/usr/local/bin/run_openvas_scan.sh"
-        minute: "0"
-        hour: "9"
+    - name: Enable and start Wazuh stack services
+      systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - wazuh-manager
+        - filebeat
+        - elasticsearch
+        - kibana
+
+  handlers:
+    - name: Restart Filebeat
+      systemd:
+        name: filebeat
+        state: restarted
