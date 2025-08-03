@@ -1,0 +1,56 @@
+---
+- name: Install Wazuh Stack and Configure OpenVAS Integration
+  hosts: test-wazuh-server
+  become: true
+
+  vars:
+    wazuh_version: "4.7.3"
+    elastic_version: "8.12.2"
+    openvas_host: test-openvas-server
+    openvas_report_dir: /home/test-openvas-server/reports
+    openvas_pull_user: root
+    openvas_pull_method: ssh
+    dashboard_only_alerting: true
+    alert_severity_threshold: 7.0
+
+  tasks:
+    - name: Install Wazuh Manager and Dependencies
+      shell: |
+        curl -sO https://packages.wazuh.com/4.7/wazuh-install.sh
+        bash wazuh-install.sh --wazuh-version {{ wazuh_version }}
+      args:
+        creates: /var/ossec/bin/wazuh-control
+
+    - name: Configure Filebeat for OpenVAS Report Parsing
+      copy:
+        dest: /etc/filebeat/filebeat.yml
+        content: |
+          filebeat.inputs:
+            - type: log
+              enabled: true
+              paths:
+                - "{{ openvas_report_dir }}/*.xml"
+              fields:
+                service: openvas
+          output.elasticsearch:
+            hosts: ["http://localhost:9200"]
+          setup.kibana:
+            host: "localhost:5601"
+      notify: Restart Filebeat
+
+    - name: Enable and start Wazuh stack services
+      systemd:
+        name: "{{ item }}"
+        enabled: true
+        state: started
+      loop:
+        - wazuh-manager
+        - filebeat
+        - elasticsearch
+        - kibana
+
+  handlers:
+    - name: Restart Filebeat
+      systemd:
+        name: filebeat
+        state: restarted
