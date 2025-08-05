@@ -19,7 +19,7 @@
     - name: Add user to sudo group
       user:
         name: "{{ username }}"
-        groups: sudo
+        groups: wheel
         append: yes
 
     - name: Ensure home directory permissions are correct
