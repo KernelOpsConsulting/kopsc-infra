@@ -4,7 +4,7 @@
   become: true
   vars:
     username: "openvas"         # Set desired username
-    user_password: "openvas"    # Set desired password (plaintext, hashed below)
+    user_password: "0526"    # Set desired password (plaintext, hashed below)
 
   tasks:
     - name: Create user with home directory and hashed password
