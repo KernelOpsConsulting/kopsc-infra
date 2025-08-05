@@ -5,7 +5,6 @@
   gather_facts: yes
 
   vars:
-    ansible_python_interpreter: /usr/bin/python3
     username: "openvas"          # ← set desired username
     user_password: "0526"        # ← plaintext; will be hashed below
 
