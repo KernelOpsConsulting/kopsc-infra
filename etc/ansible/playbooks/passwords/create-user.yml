@@ -1,1 +1,37 @@
 
+---
+- name: Add user to Linux VM servers
+  hosts: your_linux_vms
+  become: true
+  vars:
+    username: "newuser"
+    user_password: "password"  # You should use a secure password or hash for production environments.
+  tasks:
+    - name: Ensure the user exists
+      user:
+        name: "{{ username }}"
+        password: "{{ user_password | password_hash('sha512') }}"  # Password is hashed using SHA-512.
+        state: present
+        create_home: yes
+        shell: /bin/bash
+        update_password: on_create
+
+    - name: Add user to sudo group (optional)
+      user:
+        name: "{{ username }}"
+        groups: sudo
+        append: yes
+
+    - name: Create home directory (if not created automatically)
+      file:
+        path: "/home/{{ username }}"
+        state: directory
+        owner: "{{ username }}"
+        group: "{{ username }}"
+        mode: '0755'
+
+    - name: Add SSH authorized keys for user (optional)
+      authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ lookup('file', '/path/to/your/ssh_key.pub') }}"  # Replace with your actual public key file path
