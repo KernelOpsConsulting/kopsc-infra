@@ -1,29 +1,28 @@
-# Update username and password vars then execute script to create user
-#
 ---
-- name: Add user to Linux VM servers
-  hosts: all #UPDATE INVENTORY FILE
+- name: Ensure OpenVAS user exists on all target Linux VMs
+  hosts: all  # Define target hosts in your Semaphore inventory
   become: true
   vars:
-    username: "openvas" #UPDATE USER
-    user_password: "openvas" #UPDATE PASSWORD
+    username: "openvas"         # Set desired username
+    user_password: "openvas"    # Set desired password (plaintext, hashed below)
+
   tasks:
-    - name: Ensure the user exists
+    - name: Create user with home directory and hashed password
       user:
         name: "{{ username }}"
-        password: "{{ user_password | password_hash('sha512') }}"  # Password is hashed using SHA-512.
+        password: "{{ user_password | password_hash('sha512') }}"
         state: present
         create_home: yes
         shell: /bin/bash
         update_password: on_create
 
-    - name: Add user to sudo group (optional)
+    - name: Add user to sudo group
       user:
         name: "{{ username }}"
         groups: sudo
         append: yes
 
-    - name: Create home directory (if not created automatically)
+    - name: Ensure home directory permissions are correct
       file:
         path: "/home/{{ username }}"
         state: directory
