@@ -2,7 +2,7 @@
 #
 ---
 - name: Add user to Linux VM servers
-  hosts: dev-semaphore #UPDATE INVENTORY FILE
+  hosts: all #UPDATE INVENTORY FILE
   become: true
   vars:
     username: "openvas" #UPDATE USER
