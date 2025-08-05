@@ -1,55 +1,39 @@
 ---
-- name: Ensure OpenVAS user exists on all target Linux VMs
+- name: Add OpenVAS user to Linux systems with correct admin group
   hosts: all
   become: true
-  gather_facts: no
-
+  gather_facts: true
   vars:
-    username: "openvas"          # ← set desired username
-    user_password: "0526"        # ← plaintext; will be hashed below
-
+    username: openvas
+    user_password: "0526"
   tasks:
-    - name: Create user with home directory and hashed password
-      ansible.builtin.user:
+    - name: Determine admin group name
+      set_fact:
+        admin_group: "{{ 'sudo' if ansible_facts.os_family == 'Debian' else 'wheel' }}"
+
+    - name: Ensure admin group exists
+      group:
+        name: "{{ admin_group }}"
+        state: present
+
+    - name: Create user with home dir and password
+      user:
         name: "{{ username }}"
         password: "{{ user_password | password_hash('sha512') }}"
         state: present
         create_home: yes
         shell: /bin/bash
-        update_password: on_create
 
-    # --- Debian/Ubuntu (deb-based) ---
-    - name: Ensure 'sudo' group exists (Debian family)
-      ansible.builtin.group:
-        name: sudo
-        state: present
-      when: ansible_facts.os_family == "Debian"
-
-    - name: Add user to 'sudo' group (Debian family)
-      ansible.builtin.user:
+    - name: Add user to admin group
+      user:
         name: "{{ username }}"
-        groups: sudo
+        groups: "{{ admin_group }}"
         append: yes
-      when: ansible_facts.os_family == "Debian"
 
-    # --- RHEL/Rocky/Alma/Oracle/SUSE (rpm-based) ---
-    - name: Ensure 'wheel' group exists (RPM families)
-      ansible.builtin.group:
-        name: wheel
-        state: present
-      when: ansible_facts.os_family in ["RedHat", "Suse"]
-
-    - name: Add user to 'wheel' group (RPM families)
-      ansible.builtin.user:
-        name: "{{ username }}"
-        groups: wheel
-        append: yes
-      when: ansible_facts.os_family in ["RedHat", "Suse"]
-
-    - name: Ensure home directory permissions are correct
-      ansible.builtin.file:
+    - name: Ensure home directory permissions
+      file:
         path: "/home/{{ username }}"
         state: directory
         owner: "{{ username }}"
         group: "{{ username }}"
-        mode: "0755"
+        mode: '0755'
