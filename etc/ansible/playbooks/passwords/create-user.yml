@@ -2,7 +2,6 @@
 - name: Ensure OpenVAS user exists on all target Linux VMs
   hosts: all
   become: true
-  gather_facts: yes
 
   vars:
     username: "openvas"          # ← set desired username
