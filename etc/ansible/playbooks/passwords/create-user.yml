@@ -1,11 +1,12 @@
-
+# Update username and password vars then execute script to create user
+#
 ---
 - name: Add user to Linux VM servers
-  hosts: your_linux_vms
+  hosts: dev-semaphore #UPDATE INVENTORY FILE
   become: true
   vars:
-    username: "newuser"
-    user_password: "password"  # You should use a secure password or hash for production environments.
+    username: "openvas" #UPDATE USER
+    user_password: "openvas" #UPDATE PASSWORD
   tasks:
     - name: Ensure the user exists
       user:
@@ -29,9 +30,3 @@
         owner: "{{ username }}"
         group: "{{ username }}"
         mode: '0755'
-
-    - name: Add SSH authorized keys for user (optional)
-      authorized_key:
-        user: "{{ username }}"
-        state: present
-        key: "{{ lookup('file', '/path/to/your/ssh_key.pub') }}"  # Replace with your actual public key file path
