@@ -5,7 +5,7 @@
   gather_facts: true
   vars:
     username: openvas
-    user_password: "0526"
+    user_password: "password"
   tasks:
     - name: Determine admin group name
       set_fact:
