@@ -1,14 +1,16 @@
 ---
 - name: Ensure OpenVAS user exists on all target Linux VMs
-  hosts: all  # Define target hosts in your Semaphore inventory
+  hosts: all
   become: true
+  gather_facts: yes
+
   vars:
-    username: "openvas"         # Set desired username
-    user_password: "0526"    # Set desired password (plaintext, hashed below)
+    username: "openvas"          # ← set desired username
+    user_password: "0526"        # ← plaintext; will be hashed below
 
   tasks:
     - name: Create user with home directory and hashed password
-      user:
+      ansible.builtin.user:
         name: "{{ username }}"
         password: "{{ user_password | password_hash('sha512') }}"
         state: present
@@ -16,16 +18,38 @@
         shell: /bin/bash
         update_password: on_create
 
-    - name: Add user to sudo group
-      user:
+    # --- Debian/Ubuntu (deb-based) ---
+    - name: Ensure 'sudo' group exists (Debian family)
+      ansible.builtin.group:
+        name: sudo
+        state: present
+      when: ansible_facts.os_family == "Debian"
+
+    - name: Add user to 'sudo' group (Debian family)
+      ansible.builtin.user:
         name: "{{ username }}"
         groups: sudo
         append: yes
+      when: ansible_facts.os_family == "Debian"
+
+    # --- RHEL/Rocky/Alma/Oracle/SUSE (rpm-based) ---
+    - name: Ensure 'wheel' group exists (RPM families)
+      ansible.builtin.group:
+        name: wheel
+        state: present
+      when: ansible_facts.os_family in ["RedHat", "Suse"]
+
+    - name: Add user to 'wheel' group (RPM families)
+      ansible.builtin.user:
+        name: "{{ username }}"
+        groups: wheel
+        append: yes
+      when: ansible_facts.os_family in ["RedHat", "Suse"]
 
     - name: Ensure home directory permissions are correct
-      file:
+      ansible.builtin.file:
         path: "/home/{{ username }}"
         state: directory
         owner: "{{ username }}"
         group: "{{ username }}"
-        mode: '0755'
+        mode: "0755"
