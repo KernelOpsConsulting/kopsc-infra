@@ -5,26 +5,32 @@
 
 #[development]
 10.5.5.50       dev-semaphore.kernelopsconsulting.com  dev-semaphore
-10.5.5.54       dev-centos8-config.kernelopsconsulting.com  dev-centos8-config
 10.5.5.55       dev-centos9-config.kernelopsconsulting.com  dev-centos9-config
-10.5.5.56       dev-ubuntu20-config.kernelopsconsulting.com  dev-ubuntu20-config
 10.5.5.57       dev-testdummy-ubuntu20.kernelopsconsulting.com  dev-testdummy-ubuntu20
-10.5.5.84       dev-jumpbox02.kernelopsconsulting.com  dev-jumpbox02
-10.5.5.83       dev-openvas-server.kernelopsconsulting.com  dev-openvas-server
+10.5.5.94       dev-zabbix-server
 
 #[test]
 10.5.5.75       test-ansible-ken.kernelopsconsulting.com  test-ansible-ken
-10.5.5.76       test-zabbix-ken.kernelopsconsulting.com  test-zabbix-ken
 10.5.5.81       test-ansible-mike01.kernelopsconsulting.com  test-ansible-mike01
 
 #[production]
 
 #[zabbix]
-10.5.5.76       test-zabbix-ken.kernelopsconsulting.com  test-zabbix-ken
+10.5.5.94       dev-zabbix-server.kernelopsconsulting.com  dev-zabbix-server
+
+#[snow]
+10.5.5.79      test-servicenow.kernelopsconsulting.com     test-servicenow
 
 #[semaphore]
 10.5.5.50      dev-semaphore.kernelopsconsulting.com  dev-semaphore
-10.5.5.79      test-semaphore.kernelopsconsulting.com  test-semaphore
+
+#[vault]
+10.5.5.102     test-hcvault-server.kernelopsconsulting.com  test-hcvault-server
+
+#[foreman]
+10.5.5.106        test-foreman-ken.kernelopsconsulting.com    test-foreman-ken
+
+#[wazuh]
 
 #[pfsense]
 10.5.5.1        pfsense.kernelopsconsulting.com  pfsense
