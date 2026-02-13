@@ -18,8 +18,8 @@
 #[zabbix]
 10.5.5.94       dev-zabbix-server.kernelopsconsulting.com  dev-zabbix-server
 
-#[snow]
-10.5.5.79      test-servicenow.kernelopsconsulting.com     test-servicenow
+#[osticket]
+10.5.5.134      osticket.kernelopsconsulting.com     osticket
 
 #[semaphore]
 10.5.5.50      dev-semaphore.kernelopsconsulting.com  dev-semaphore
