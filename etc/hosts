@@ -37,3 +37,8 @@
 
 #[proxmox]
 10.5.5.3        proxmox.kernelopsconsulting.com  proxmox
+
+#[truenas]
+10.5.5.4        truenas.kernelopsconsulting.com  truenas
+#[truenas-rep]
+10.5.5.5        truenas-rep.kernelopsconsulting.com  truenas-rep
